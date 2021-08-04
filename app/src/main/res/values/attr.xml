@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- fragment -->
+    <attr name="fragment_background" format="reference"/>
+
+    <!-- text -->
+    <attr name="text_primary_color" format="color"/>
+
+    <!-- image -->
+    <attr name="image_tint" format="color"/>
+
+    <!-- recycler -->
+    <attr name="line_divider" format="color"/>
+</resources>

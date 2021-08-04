@@ -1,0 +1,19 @@
+<resources>
+    <style name="Theme.MyMediaPlayer" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/black</item>
+
+        <!-- fragment -->
+        <item name="fragment_background">@color/light_black</item>
+
+        <!-- text -->
+        <item name="text_primary_color">@color/white_85</item>
+
+        <!-- image -->
+        <item name="image_tint">@color/white_85</item>>
+
+        <!-- recycler -->
+        <item name="line_divider">@color/dark_grey</item>
+    </style>
+</resources>

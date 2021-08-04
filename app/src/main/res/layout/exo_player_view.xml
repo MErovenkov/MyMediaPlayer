@@ -1,0 +1,39 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+    <com.google.android.exoplayer2.ui.AspectRatioFrameLayout android:id="@id/exo_content_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center">
+
+        <View android:id="@id/exo_shutter"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/black"/>
+
+        <ProgressBar
+            android:id="@id/exo_buffering"
+            android:theme="@style/ProgressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleLarge"/>
+
+        <TextView
+            android:id="@id/exo_error_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@drawable/ic_exo_error_background"
+            android:gravity="center"
+            android:padding="16dp"
+            android:fontFamily="@font/roboto"
+            android:textSize="16sp"
+            android:textColor="@color/white"
+            android:text="@string/error_massage" />
+
+    </com.google.android.exoplayer2.ui.AspectRatioFrameLayout>
+
+    <View android:id="@id/exo_controller_placeholder"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+</merge>

@@ -1,0 +1,18 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Медиа Плеер</string>
+
+    <!-- Toast -->
+    <string name="error_media_json_not_found">Файл с медиаданными не обноружен</string>
+
+    <!-- ExoPlayer error massage -->
+    <string name="error_no_internet_access">Нет доступа в интернет</string>
+    <string name="error_invalid_media_address">Некорректный медиа адрес</string>
+
+    <!-- Strings used for fragments for navigation -->
+    <string name="media_fragment_label">Media Fragment</string>
+    <string name="exo_player_fragment_label">ExoPlayer Fragment</string>
+
+    <!-- ExoPlayer view -->
+    <string name="error_massage">Error massage</string>
+    <string name="default_value">00:00</string>
+</resources>

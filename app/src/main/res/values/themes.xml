@@ -1,0 +1,23 @@
+<resources>
+    <style name="Theme.MyMediaPlayer" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/black</item>
+        <item name="colorPrimaryDark">@color/black</item>
+        <item name="colorAccent">@color/black</item>
+
+        <!-- fragment -->
+        <item name="fragment_background">@color/white</item>
+
+        <!-- text -->
+        <item name="text_primary_color">@color/light_black</item>
+
+        <!-- image -->
+        <item name="image_tint">@color/black</item>>
+
+        <!-- recycler -->
+        <item name="line_divider">@color/gray_55</item>
+    </style>
+
+    <style name="ProgressBarStyle">
+        <item name="colorAccent">@color/white</item>
+    </style>
+</resources>

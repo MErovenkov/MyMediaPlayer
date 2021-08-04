@@ -1,0 +1,14 @@
+[
+  {
+    "title": "Big Buck Bunny",
+    "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+  },
+  {
+    "title": "Apple 4x3 basic stream",
+    "url": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8"
+  },
+  {
+    "title": "Tears of Steel",
+    "url": "https://storage.googleapis.com/wvmedia/clear/h264/tears/tears.mpd"
+  }
+]
