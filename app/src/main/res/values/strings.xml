@@ -5,8 +5,10 @@
     <string name="error_media_json_not_found">Файл с медиаданными не обноружен</string>
 
     <!-- ExoPlayer error massage -->
-    <string name="error_no_internet_access">Нет доступа в интернет</string>
-    <string name="error_invalid_media_address">Некорректный медиа адрес</string>
+    <string name="error_no_internet_access">Нет доступа в Интернет</string>
+    <string name="error_network_connection_timeout">Потерян доступ к медиа хостингу</string>
+    <string name="error_file_not_found">Такого файла не существует</string>
+    <string name="error_media_host_unavailable">Медиа хостинг недоступен</string>
 
     <!-- Strings used for fragments for navigation -->
     <string name="media_fragment_label">Media Fragment</string>

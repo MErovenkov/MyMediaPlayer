@@ -13,14 +13,13 @@ import com.example.mymediaplayer.databinding.ExoplayerControlViewBinding
 import com.example.mymediaplayer.databinding.FragmentExoPlayerBinding
 import com.example.mymediaplayer.util.CheckStatusNetwork
 import com.example.mymediaplayer.util.extensions.*
-import com.google.android.exoplayer2.ExoPlaybackException
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.upstream.HttpDataSource
 import com.google.android.exoplayer2.util.ErrorMessageProvider
 import com.google.android.exoplayer2.util.Util
 
-class ExoPlayerFragment: Fragment(), ErrorMessageProvider<ExoPlaybackException> {
+class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
 
     companion object {
         private const val TITLE_KEY = "title"
@@ -150,24 +149,15 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<ExoPlaybackException> 
         showSystemBars()
     }
 
-    override fun getErrorMessage(error: ExoPlaybackException): Pair<Int, String> {
-        var errorString = ""
-
-        when (error.type) {
-            ExoPlaybackException.TYPE_SOURCE -> {
-                errorString = when (error.sourceException) {
-                    is HttpDataSource.HttpDataSourceException -> {
-                        if (!CheckStatusNetwork.isActive) {
-                            getString(R.string.error_no_internet_access)
-                        } else error.sourceException.message.toString()
-                    }
-
-                    else -> getString(R.string.error_invalid_media_address)
-                }
+    override fun getErrorMessage(error: PlaybackException): Pair<Int, String> {
+        val errorString: String = when (error.errorCode) {
+            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_FAILED -> {
+                if (!CheckStatusNetwork.isActive) getString(R.string.error_no_internet_access)
+                else getString(R.string.error_media_host_unavailable)
             }
-            ExoPlaybackException.TYPE_REMOTE -> errorString = error.message.toString()
-            ExoPlaybackException.TYPE_RENDERER -> errorString = error.rendererException.message.toString()
-            ExoPlaybackException.TYPE_UNEXPECTED -> errorString = error.unexpectedException.message.toString()
+            PlaybackException.ERROR_CODE_IO_NETWORK_CONNECTION_TIMEOUT -> getString(R.string.error_network_connection_timeout)
+            PlaybackException.ERROR_CODE_IO_FILE_NOT_FOUND -> getString(R.string.error_file_not_found)
+            else -> error.errorCodeName
         }
 
         return Pair.create(0, errorString)
