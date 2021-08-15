@@ -13,7 +13,6 @@ import com.example.mymediaplayer.databinding.FragmentMediaBinding
 import com.example.mymediaplayer.ui.navigation.IMediaNavigation
 import com.example.mymediaplayer.ui.recycler.LineDivider
 import com.example.mymediaplayer.ui.recycler.MediaItemAdapter
-import com.example.mymediaplayer.ui.recycler.MediaItemHolder
 import com.example.mymediaplayer.util.UiState
 import com.example.mymediaplayer.util.extensions.getFragmentComponent
 import com.example.mymediaplayer.viewmodel.MediaViewModel
@@ -49,12 +48,10 @@ class MediaFragment: Fragment() {
 
     private fun initRecyclerView() {
         adapterRecyclerView = object : MediaItemAdapter() {
-            override fun onClickItem(holder: MediaItemHolder, position: Int) {
-                holder.itemView.setOnClickListener {
-                    getItem(position).apply {
-                        mediaNavigation.openMedia(mediaMetadata.title.toString(),
-                                                  playbackProperties!!.uri)
-                    }
+            override fun onClickItem(position: Int) {
+                getItem(position).apply {
+                    mediaNavigation.openMedia(mediaMetadata.title.toString(),
+                                              playbackProperties!!.uri)
                 }
             }
         }

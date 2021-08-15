@@ -15,13 +15,17 @@ abstract class MediaItemAdapter: RecyclerView.Adapter<MediaItemHolder>(), ItemTo
     }
 
     override fun onBindViewHolder(holder: MediaItemHolder, position: Int) {
-        holder.bind(itemList[position])
-        onClickItem(holder, position)
+        holder.apply {
+            bind(itemList[position])
+            itemView.setOnClickListener {
+                onClickItem(position)
+            }
+        }
     }
 
     override fun getItemCount(): Int = itemList.size
 
-    override fun onClickItem(holder: MediaItemHolder, position: Int) {}
+    override fun onClickItem(position: Int) {}
 
     fun getItem(position: Int): MediaItem = itemList[position]
 
