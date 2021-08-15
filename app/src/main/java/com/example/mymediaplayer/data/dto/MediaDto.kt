@@ -6,8 +6,12 @@ import com.squareup.moshi.JsonClass
 @JsonClass(generateAdapter = true)
 class MediaDto (
     @Json(name = "title")
-    val title: String,
+    val title: String = DEFAULT_MEDIA_NAME,
 
     @Json(name = "url")
-    val url: String
-)
+    val url: String? = null
+) {
+    companion object {
+        private const val DEFAULT_MEDIA_NAME = "MEDIA_NAME"
+    }
+}

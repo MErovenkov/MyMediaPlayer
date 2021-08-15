@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +14,7 @@ import com.example.mymediaplayer.ui.recycler.LineDivider
 import com.example.mymediaplayer.ui.recycler.MediaItemAdapter
 import com.example.mymediaplayer.util.UiState
 import com.example.mymediaplayer.util.extensions.getFragmentComponent
+import com.example.mymediaplayer.util.extensions.showToast
 import com.example.mymediaplayer.viewmodel.MediaViewModel
 import com.google.android.exoplayer2.MediaItem
 import kotlinx.coroutines.flow.collect
@@ -50,8 +50,12 @@ class MediaFragment: Fragment() {
         adapterRecyclerView = object : MediaItemAdapter() {
             override fun onClickItem(position: Int) {
                 getItem(position).apply {
-                    mediaNavigation.openMedia(mediaMetadata.title.toString(),
-                                              playbackProperties!!.uri)
+                    if (playbackProperties == null || playbackProperties?.uri == null) {
+                        showToast(R.string.error_media_address_not_found)
+                    } else {
+                        mediaNavigation.openMedia(mediaMetadata.title.toString(),
+                                                  playbackProperties!!.uri)
+                    }
                 }
             }
         }
@@ -72,9 +76,7 @@ class MediaFragment: Fragment() {
                    is UiState.Success<ArrayList<MediaItem>> -> adapterRecyclerView
                        .submitList(it.resources)
 
-                   is UiState.Error -> Toast
-                       .makeText(requireContext(), it.message, Toast.LENGTH_SHORT)
-                       .show()
+                   is UiState.Error -> showToast(it.message)
                }
            }
        }
