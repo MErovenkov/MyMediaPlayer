@@ -60,6 +60,7 @@ class MediaFragment: Fragment() {
             setHasFixedSize(false)
             layoutManager = LinearLayoutManager(requireContext())
             adapter = adapterRecyclerView
+            itemAnimator = null
             addItemDecoration(LineDivider(requireContext(), R.drawable.recycler_line_divider))
         }
     }
@@ -69,7 +70,7 @@ class MediaFragment: Fragment() {
            mediaViewModel.recyclerState.collect {
                when(it) {
                    is UiState.Success<ArrayList<MediaItem>> -> adapterRecyclerView
-                       .updateItem(it.resources)
+                       .submitList(it.resources)
 
                    is UiState.Error -> Toast
                        .makeText(requireContext(), it.message, Toast.LENGTH_SHORT)
