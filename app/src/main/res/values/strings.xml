@@ -3,7 +3,6 @@
 
     <!-- Toast -->
     <string name="error_media_json_not_found">Файл с медиаданными не обноружен</string>
-    <string name="error_media_address_not_found">Медиа адрес отсутствует</string>
 
     <!-- ExoPlayer error massage -->
     <string name="error_no_internet_access">Нет доступа в Интернет</string>

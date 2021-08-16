@@ -18,7 +18,9 @@ class MediaLocalData(private val parser: Parser) {
     fun getMediaItemList(): Flow<ArrayList<MediaItem>> = flow {
         val mediaDtoList = runCatching { parser.parseAssetFile(NAME_MEDIA_JSON_FILE) }.getOrThrow()
 
-        val mediaItemList = mediaDtoList?.map { mediaDto ->
+        val mediaItemList = mediaDtoList
+            ?.filter { mediaDto -> mediaDto.url != null }
+            ?.map { mediaDto ->
                 MediaItem.Builder()
                     .setUri(mediaDto.url)
                     .setMediaMetadata(

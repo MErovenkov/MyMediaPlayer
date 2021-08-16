@@ -49,12 +49,8 @@ class MediaFragment: Fragment() {
         adapterRecyclerView = object : MediaItemAdapter() {
             override fun onClickItem(position: Int) {
                 getItem(position).apply {
-                    if (playbackProperties == null || playbackProperties?.uri == null) {
-                        showToast(R.string.error_media_address_not_found)
-                    } else {
-                        mediaNavigation.openMedia(mediaMetadata.title.toString(),
-                                                  playbackProperties!!.uri)
-                    }
+                    mediaNavigation.openMedia(mediaMetadata.title.toString(),
+                                              playbackProperties!!.uri)
                 }
             }
         }
