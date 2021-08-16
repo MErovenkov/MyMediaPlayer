@@ -17,10 +17,9 @@ class Parser(moshi: Moshi, context: Context) {
     fun parseAssetFile(nameFile: String): List<MediaDto>? {
         var json: String
 
-        applicationContext.assets.open(nameFile).bufferedReader().apply {
-            json = readText()
-            close()
-        }
+        applicationContext.assets.open(nameFile)
+            .bufferedReader()
+            .use { json = it.readText() }
 
         return parserAdapter.fromJson(json)
     }
