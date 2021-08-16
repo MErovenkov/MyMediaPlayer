@@ -16,7 +16,6 @@ import com.example.mymediaplayer.util.UiState
 import com.example.mymediaplayer.util.extensions.getFragmentComponent
 import com.example.mymediaplayer.util.extensions.showToast
 import com.example.mymediaplayer.viewmodel.MediaViewModel
-import com.google.android.exoplayer2.MediaItem
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -73,9 +72,7 @@ class MediaFragment: Fragment() {
        viewLifecycleOwner.lifecycleScope.launch {
            mediaViewModel.recyclerState.collect {
                when(it) {
-                   is UiState.Success<ArrayList<MediaItem>> -> adapterRecyclerView
-                       .submitList(it.resources)
-
+                   is UiState.Success -> adapterRecyclerView.submitList(it.resources)
                    is UiState.Error -> showToast(it.message)
                }
            }
