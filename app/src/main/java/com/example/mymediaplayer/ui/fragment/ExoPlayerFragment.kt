@@ -58,7 +58,7 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        exoplayerControlBinding = ExoplayerControlViewBinding.bind(requireView())
+        exoplayerControlBinding = ExoplayerControlViewBinding.bind(view)
     }
 
     override fun onViewStateRestored(savedInstanceState: Bundle?) {
