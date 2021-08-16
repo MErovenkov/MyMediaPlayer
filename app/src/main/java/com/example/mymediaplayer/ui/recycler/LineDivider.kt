@@ -10,19 +10,25 @@ import androidx.recyclerview.widget.RecyclerView
 
 class LineDivider(context: Context, @DrawableRes dividerRes: Int): RecyclerView.ItemDecoration() {
     private val divider: Drawable = ContextCompat.getDrawable(context, dividerRes)!!
+    private val dividerRect = Rect()
 
     override fun onDrawOver(convas: Canvas, parent: RecyclerView) {
-        val left = parent.paddingLeft + divider.opticalInsets.left
-        val right = parent.width - parent.paddingRight - divider.opticalInsets.right
+        dividerRect.apply {
+            left = parent.paddingLeft
+            right = parent.width - parent.paddingRight
+        }
 
         for (i in 0 until parent.childCount) {
             val child = parent.getChildAt(i)
             val params = child.layoutParams as RecyclerView.LayoutParams
-            val top = child.bottom + params.bottomMargin
-            val bottom = top + divider.intrinsicHeight
+
+            dividerRect.apply {
+                top = child.bottom + params.bottomMargin
+                bottom = dividerRect.top + divider.intrinsicHeight
+            }
 
             divider.apply {
-                bounds = Rect(left, top, right, bottom)
+                bounds = dividerRect
                 draw(convas)
             }
         }
