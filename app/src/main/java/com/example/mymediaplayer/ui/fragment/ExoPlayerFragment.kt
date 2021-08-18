@@ -40,8 +40,8 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
     private lateinit var exoplayerControlBinding: ExoplayerControlViewBinding
 
     private var exoPlayer: SimpleExoPlayer? = null
-    private var mPlayWhenReady = true
-    private var mContentPosition = 0L
+    private var playWhenReady = true
+    private var contentPosition = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -65,8 +65,8 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
         super.onViewStateRestored(savedInstanceState)
 
         if (savedInstanceState != null) {
-            mContentPosition = savedInstanceState.getLong(CONTENT_POSITION_KEY, 0)
-            mPlayWhenReady = savedInstanceState.getBoolean(PLAY_WHEN_READY_KEY, true)
+            contentPosition = savedInstanceState.getLong(CONTENT_POSITION_KEY, 0)
+            playWhenReady = savedInstanceState.getBoolean(PLAY_WHEN_READY_KEY, true)
         }
     }
 
@@ -87,24 +87,24 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
     private fun initializePlayer() {
         exoPlayer = SimpleExoPlayer.Builder(requireContext())
             .build()
-            .also { mExoPlayer ->
+            .also { exoPlayer ->
                 fragmentBinding.playerView.apply {
-                    player = mExoPlayer
+                    player = exoPlayer
                     setErrorMessageProvider(this@ExoPlayerFragment)
                 }
 
                 requireArguments().apply {
                     exoplayerControlBinding.videoName.text = getString(TITLE_KEY)
 
-                    mExoPlayer.apply {
+                    exoPlayer.apply {
                         setMediaItem(
                             MediaItem.Builder()
                                 .setUri(getString(URL_KEY))
                                 .build()
                         )
 
-                        seekTo(mContentPosition)
-                        playWhenReady = mPlayWhenReady
+                        seekTo(this@ExoPlayerFragment.contentPosition)
+                        playWhenReady = this@ExoPlayerFragment.playWhenReady
 
                         prepare()
                     }
@@ -114,8 +114,8 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
 
     override fun onPause() {
         super.onPause()
-        mContentPosition = exoPlayer!!.contentPosition
-        mPlayWhenReady = exoPlayer!!.playWhenReady
+        contentPosition = exoPlayer!!.contentPosition
+        playWhenReady = exoPlayer!!.playWhenReady
 
         if (Util.SDK_INT <= 23) {
             releasePlayer()
@@ -125,8 +125,8 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
 
-        outState.putLong(CONTENT_POSITION_KEY, mContentPosition)
-        outState.putBoolean(PLAY_WHEN_READY_KEY, mPlayWhenReady)
+        outState.putLong(CONTENT_POSITION_KEY, contentPosition)
+        outState.putBoolean(PLAY_WHEN_READY_KEY, playWhenReady)
     }
 
     override fun onStop() {
