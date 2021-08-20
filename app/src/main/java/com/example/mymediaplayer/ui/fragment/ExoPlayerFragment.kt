@@ -47,12 +47,7 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         fragmentBinding = FragmentExoPlayerBinding.inflate(inflater, container, false)
-        getFragmentComponent().inject(this)
-
-       if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-           hideSystemBars()
-       }
-
+        
         return fragmentBinding.root
     }
 
@@ -147,6 +142,16 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
     override fun onDestroyView() {
         super.onDestroyView()
         showSystemBars()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            hideSystemBars()
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            showSystemBars()
+        }
     }
 
     override fun getErrorMessage(error: PlaybackException): Pair<Int, String> {
