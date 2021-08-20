@@ -3,10 +3,11 @@ package com.example.mymediaplayer.data.repository
 import com.example.mymediaplayer.util.Parser
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaMetadata
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import java.io.FileNotFoundException
-import kotlin.jvm.Throws
 
 class MediaLocalData(private val parser: Parser) {
 
@@ -16,7 +17,9 @@ class MediaLocalData(private val parser: Parser) {
 
     @Throws(FileNotFoundException::class)
     fun getMediaItemList(): Flow<ArrayList<MediaItem>> = flow {
-        val mediaDtoList = runCatching { parser.parseAssetFile(NAME_MEDIA_JSON_FILE) }.getOrThrow()
+        val mediaDtoList = withContext(Dispatchers.IO) {
+            parser.parseAssetFile(NAME_MEDIA_JSON_FILE)
+        }
 
         val mediaItemList = mediaDtoList
             ?.filter { mediaDto -> mediaDto.url != null }

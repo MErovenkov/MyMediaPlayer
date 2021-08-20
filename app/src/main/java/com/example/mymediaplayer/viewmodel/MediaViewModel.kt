@@ -23,8 +23,7 @@ class MediaViewModel(private val repository: Repository): ViewModel() {
     }
 
     init {
-        viewModelScope.launch(handler) {
-            @Suppress("BlockingMethodInNonBlockingContext")
+        CoroutineScope(viewModelScope.coroutineContext + handler).launch(Dispatchers.IO) {
             repository.getMediaItems().collect {
                 _recyclerState.value = UiState.Success(it)
             }
