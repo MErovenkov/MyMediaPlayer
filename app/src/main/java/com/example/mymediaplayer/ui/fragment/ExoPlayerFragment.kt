@@ -89,7 +89,7 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
                 }
 
                 requireArguments().apply {
-                    exoplayerControlBinding.videoName.text = getString(TITLE_KEY)
+                    exoplayerControlBinding.exoVideoTitle.text = getString(TITLE_KEY)
 
                     exoPlayer.apply {
                         setMediaItem(
