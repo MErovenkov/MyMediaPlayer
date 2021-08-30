@@ -1,5 +1,7 @@
 package com.example.mymediaplayer.util.extensions
 
+import android.content.pm.PackageManager
+import android.os.Build
 import android.widget.Toast
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -23,4 +25,10 @@ fun Fragment.showSystemBars() {
 
 fun Fragment.showToast(event: Int) {
     Toast.makeText(requireContext(), this.getString(event), Toast.LENGTH_SHORT).show()
+}
+
+fun Fragment.isSupportPipMod(): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        requireContext().packageManager.hasSystemFeature(PackageManager.FEATURE_PICTURE_IN_PICTURE)
+    } else false
 }

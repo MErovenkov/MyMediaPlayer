@@ -18,4 +18,5 @@
     <string name="exo_error_massage">Error massage</string>
     <string name="exo_time_default_value">00:00</string>
     <string name="exo_time_dividing_line">/</string>
+    <string name="exo_picture_in_picture_description">Picture in picture</string>
 </resources>
