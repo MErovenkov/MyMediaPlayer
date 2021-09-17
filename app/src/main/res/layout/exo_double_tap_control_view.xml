@@ -1,0 +1,32 @@
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <com.example.mymediaplayer.ui.player.controller.DoubleTapControlView
+        android:id="@id/exo_double_tap_control"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:tapDelay="400">
+
+        <com.example.mymediaplayer.ui.player.view.SemicircleRippleView
+            android:id="@id/semicircle_ripple"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:semicircleColor="@color/gray_30"
+            app:rippleColor="@color/gray_20"
+            app:animationDuration="800" />
+
+        <com.example.mymediaplayer.ui.player.view.TrianglesRewindView
+            android:id="@id/triangle_rewind"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="5dp"
+            app:triangleColor="@color/white"/>
+
+        <com.example.mymediaplayer.ui.player.view.TextSecondView
+            android:id="@id/text_second"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="5dp"
+            app:textColor="@color/white"/>
+
+    </com.example.mymediaplayer.ui.player.controller.DoubleTapControlView>
+</merge>
