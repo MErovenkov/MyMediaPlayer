@@ -102,7 +102,7 @@ class DoubleTapControlView @JvmOverloads constructor(
         val height = when (MeasureSpec.getMode(heightMeasureSpec)) {
             MeasureSpec.EXACTLY -> MeasureSpec.getSize(heightMeasureSpec)
             MeasureSpec.AT_MOST -> playerView!!.measuredHeight
-            else -> trianglesRewindView!!.measuredHeight
+            else -> playerView!!.measuredHeight
         }
 
         setMeasuredDimension(width, height)
