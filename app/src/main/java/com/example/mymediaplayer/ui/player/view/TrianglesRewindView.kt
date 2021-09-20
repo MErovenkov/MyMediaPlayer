@@ -136,6 +136,8 @@ class TrianglesRewindView @JvmOverloads constructor(
                 recycle()
             }
         }
+
+        start()
     }
 
     private fun antiAliasPaint(): Paint {
@@ -216,12 +218,12 @@ class TrianglesRewindView @JvmOverloads constructor(
         }
     }
 
-    override fun onVisibilityAggregated(isVisible: Boolean) {
-        super.onVisibilityAggregated(isVisible)
+    override fun setVisibility(visibility: Int) {
+        super.setVisibility(visibility)
 
-        when(isVisible) {
-            true -> start()
-            false -> stop()
+        when(visibility) {
+            VISIBLE -> start()
+            else -> stop()
         }
     }
 }
