@@ -1,11 +1,11 @@
 package com.example.mymediaplayer.util.extensions
 
 import android.app.AppOpsManager
-import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.app.AppOpsManagerCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -36,19 +36,15 @@ fun Fragment.isSupportPipMod(): Boolean {
     } else false
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 fun Fragment.isPipModeEnable(): Boolean {
-    val appOps = requireContext().getSystemService(Context.APP_OPS_SERVICE) as AppOpsManager
-    val op = AppOpsManager.OPSTR_PICTURE_IN_PICTURE
-    val uid = android.os.Process.myUid()
-    val packageName = requireContext().packageName
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)  {
+        val uid = android.os.Process.myUid()
+        val op = AppOpsManager.OPSTR_PICTURE_IN_PICTURE
+        val packageName = requireContext().packageName
 
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            appOps.unsafeCheckOpNoThrow(op, uid, packageName) == AppOpsManager.MODE_ALLOWED
-        } else {
-            @Suppress("DEPRECATION")
-            appOps.checkOpNoThrow(op, uid, packageName) == AppOpsManager.MODE_ALLOWED
+        when (AppOpsManagerCompat.noteOpNoThrow(requireContext(), op, uid, packageName)) {
+            AppOpsManagerCompat.MODE_ALLOWED -> true
+            else ->  false
         }
     } else false
 }

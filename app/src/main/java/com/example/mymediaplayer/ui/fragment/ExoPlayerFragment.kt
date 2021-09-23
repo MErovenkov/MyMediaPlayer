@@ -156,8 +156,6 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
 
     override fun onStart() {
         super.onStart()
-
-        @RequiresApi(Build.VERSION_CODES.O)
         when (isPipModeEnable()) {
             true -> exoPlayerControlBinding.pictureInPicture.visibility = View.VISIBLE
             false -> exoPlayerControlBinding.pictureInPicture.visibility = View.GONE
