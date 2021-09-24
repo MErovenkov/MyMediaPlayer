@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- fragment -->
+    <!-- Fragment -->
     <attr name="fragment_background" format="reference"/>
 
-    <!-- text -->
+    <!-- Text -->
     <attr name="text_primary_color" format="color"/>
 
-    <!-- image -->
+    <!-- Image -->
     <attr name="image_tint" format="color"/>
 
-    <!-- recycler -->
+    <!-- Recycler -->
     <attr name="line_divider" format="color"/>
 
     <attr name="animationDuration" format="integer"/>

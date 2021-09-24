@@ -13,7 +13,7 @@ import com.google.android.exoplayer2.ui.PlayerView
 
 class DoubleTapPlayerView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-) : PlayerView(context, attrs, defStyleAttr), Player.Listener {
+) : PlayerView(context, attrs, defStyleAttr) {
 
     private var doubleTapControlView: IDoubleTapControlView? = null
     private var doubleTapControllerId: Int = -1
