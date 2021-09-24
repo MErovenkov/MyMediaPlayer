@@ -104,6 +104,17 @@
         app:unplayed_color="@color/white_20" />
 
     <ImageButton
+        android:id="@+id/exo_change_quality"
+        android:contentDescription="@string/exo_change_quality_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="15dp"
+        android:background="@null"
+        android:src="@drawable/ic_exo_change_quality"
+        app:layout_constraintBottom_toTopOf="@+id/exo_progress"
+        app:layout_constraintEnd_toStartOf="@+id/picture_in_picture" />
+
+    <ImageButton
         android:id="@+id/picture_in_picture"
         android:contentDescription="@string/exo_picture_in_picture_description"
         android:layout_width="wrap_content"

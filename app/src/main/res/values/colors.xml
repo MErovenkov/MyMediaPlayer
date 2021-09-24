@@ -13,4 +13,6 @@
     <color name="white_20">#33FFFFFF</color>
     <color name="white_85">#D8FFFFFF</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="transparent">#00FFFFFF</color>
 </resources>

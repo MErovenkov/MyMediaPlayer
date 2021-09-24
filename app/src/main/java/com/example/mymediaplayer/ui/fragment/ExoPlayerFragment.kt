@@ -24,15 +24,19 @@ import androidx.fragment.app.Fragment
 import com.example.mymediaplayer.R
 import com.example.mymediaplayer.databinding.ExoPlayerControlViewBinding
 import com.example.mymediaplayer.databinding.FragmentExoPlayerBinding
+import com.example.mymediaplayer.ui.player.VideoQualityTrackSelector
 import com.example.mymediaplayer.util.CheckStatusNetwork
 import com.example.mymediaplayer.util.extensions.*
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
+import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
+import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.trackselection.*
 import com.google.android.exoplayer2.util.ErrorMessageProvider
 import com.google.android.exoplayer2.util.Util
 
-class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
+class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<PlaybackException> {
 
     companion object {
         private const val TITLE_KEY = "title"
@@ -40,6 +44,7 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
 
         private const val CONTENT_POSITION_KEY = "contentPosition"
         private const val PLAY_WHEN_READY_KEY = "playerWhenReady"
+        private const val INDEX_CHOICE_QUALITY_KEY = "choiceQuality"
 
         private const val ACTION_PIP_CONTROL = "pip_control"
         private const val EXTRA_CONTROL_TYPE = "control_type"
@@ -60,6 +65,8 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
     private var exoPlayer: SimpleExoPlayer? = null
     private var playWhenReady = true
     private var contentPosition = 0L
+    private var trackSelector: VideoQualityTrackSelector? = null
+    private var indexChoiceQuality = 0
 
     private lateinit var broadcastReceiver: BroadcastReceiver
     private lateinit var actionPlay: RemoteAction
@@ -77,6 +84,11 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         exoPlayerControlBinding = ExoPlayerControlViewBinding.bind(view)
+            .apply {
+                exoChangeQuality.setOnClickListener {
+                    trackSelector?.showQualityDialog()
+                }
+            }
 
         @RequiresApi(Build.VERSION_CODES.O)
         if (isSupportPipMod()) {
@@ -151,6 +163,7 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
         if (savedInstanceState != null) {
             contentPosition = savedInstanceState.getLong(CONTENT_POSITION_KEY, 0)
             playWhenReady = savedInstanceState.getBoolean(PLAY_WHEN_READY_KEY, true)
+            indexChoiceQuality = savedInstanceState.getInt(INDEX_CHOICE_QUALITY_KEY, 0)
         }
     }
 
@@ -176,13 +189,21 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
     }
 
     private fun initializePlayer() {
+        trackSelector = VideoQualityTrackSelector(requireContext())
+            .apply {
+                indexChoiceQuality = this@ExoPlayerFragment.indexChoiceQuality
+            }
+
         exoPlayer = SimpleExoPlayer.Builder(requireContext())
+            .setTrackSelector(trackSelector!!)
             .build()
             .also { exoPlayer ->
                 requireArguments().apply {
                     exoPlayerControlBinding.exoVideoTitle.text = getString(TITLE_KEY)
 
                     exoPlayer.apply {
+                        addListener(this@ExoPlayerFragment)
+
                         setMediaItem(
                             MediaItem.Builder()
                                 .setUri(getString(URL_KEY))
@@ -215,6 +236,7 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
 
         outState.putLong(CONTENT_POSITION_KEY, contentPosition)
         outState.putBoolean(PLAY_WHEN_READY_KEY, playWhenReady)
+        outState.putInt(INDEX_CHOICE_QUALITY_KEY, indexChoiceQuality)
     }
 
     override fun onStop() {
@@ -232,6 +254,10 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
         }
         exoPlayer = null
         fragmentBinding.playerView.player = null
+
+        indexChoiceQuality = trackSelector!!.indexChoiceQuality
+        trackSelector!!.dismissQualityDialog()
+        trackSelector = null
     }
 
     override fun onDestroyView() {
@@ -251,6 +277,11 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
            requireActivity().showSystemBars()
        }
    }
+
+    override fun onTracksChanged(trackGroups: TrackGroupArray,
+                                 trackSelections: TrackSelectionArray) {
+        trackSelector?.buildQualityDialog(requireContext())
+    }
 
     override fun getErrorMessage(error: PlaybackException): Pair<Int, String> {
         val errorString: String = when (error.errorCode) {

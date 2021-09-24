@@ -12,6 +12,10 @@
     <!-- Recycler -->
     <attr name="line_divider" format="color"/>
 
+    <!-- Quality dialog -->
+    <attr name="quality_mark_color" format="color"/>
+
+    <!-- Custom view -->
     <attr name="animationDuration" format="integer"/>
 
     <item name="exo_double_tap_control" type="id" />

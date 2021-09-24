@@ -15,6 +15,9 @@
 
         <!-- Recycler -->
         <item name="line_divider">@color/gray_55</item>
+
+        <!-- Quality dialog -->
+        <item name="quality_mark_color">@color/black</item>
     </style>
 
     <style name="ProgressBarStyle">
