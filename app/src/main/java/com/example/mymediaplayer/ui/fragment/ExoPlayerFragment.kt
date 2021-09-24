@@ -234,16 +234,16 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        showSystemBars()
+        requireActivity().showSystemBars()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
 
         if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            hideSystemBars()
+            requireActivity().hideSystemBars()
         } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            showSystemBars()
+            requireActivity().showSystemBars()
         }
     }
 
