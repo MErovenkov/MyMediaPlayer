@@ -156,6 +156,8 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
 
     override fun onStart() {
         super.onStart()
+        changeVisibilitySystemBars(requireContext().resources.configuration)
+
         when (isPipModeEnable()) {
             true -> exoPlayerControlBinding.pictureInPicture.visibility = View.VISIBLE
             false -> exoPlayerControlBinding.pictureInPicture.visibility = View.GONE
@@ -239,13 +241,16 @@ class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            requireActivity().hideSystemBars()
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            requireActivity().showSystemBars()
-        }
+        changeVisibilitySystemBars(newConfig)
     }
+
+   private fun changeVisibilitySystemBars(newConfig: Configuration) {
+       if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+           requireActivity().hideSystemBars()
+       } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+           requireActivity().showSystemBars()
+       }
+   }
 
     override fun getErrorMessage(error: PlaybackException): Pair<Int, String> {
         val errorString: String = when (error.errorCode) {
