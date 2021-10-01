@@ -24,8 +24,9 @@ import androidx.fragment.app.Fragment
 import com.example.mymediaplayer.R
 import com.example.mymediaplayer.databinding.ExoPlayerControlViewBinding
 import com.example.mymediaplayer.databinding.FragmentExoPlayerBinding
-import com.example.mymediaplayer.ui.player.VideoQualityTrackSelector
+import com.example.mymediaplayer.ui.player.selector.TrackSelector
 import com.example.mymediaplayer.util.CheckStatusNetwork
+import com.example.mymediaplayer.util.HolderSelectedTrackItems
 import com.example.mymediaplayer.util.extensions.*
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.PlaybackException
@@ -44,7 +45,9 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
 
         private const val CONTENT_POSITION_KEY = "contentPosition"
         private const val PLAY_WHEN_READY_KEY = "playerWhenReady"
-        private const val INDEX_CHOICE_QUALITY_KEY = "choiceQuality"
+
+        private const val SELECTED_TRACK_ITEMS_KEY = "holderSelectedTrackItems"
+        private const val TRACK_TYPE_VIDEO_INDEX = 0
 
         private const val ACTION_PIP_CONTROL = "pip_control"
         private const val EXTRA_CONTROL_TYPE = "control_type"
@@ -65,8 +68,8 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
     private var exoPlayer: SimpleExoPlayer? = null
     private var playWhenReady = true
     private var contentPosition = 0L
-    private var trackSelector: VideoQualityTrackSelector? = null
-    private var indexChoiceQuality = 0
+    private var trackSelector: TrackSelector? = null
+    private var holderSelectedTrackItems: HolderSelectedTrackItems = HolderSelectedTrackItems()
 
     private lateinit var broadcastReceiver: BroadcastReceiver
     private lateinit var actionPlay: RemoteAction
@@ -86,7 +89,7 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
         exoPlayerControlBinding = ExoPlayerControlViewBinding.bind(view)
             .apply {
                 exoChangeQuality.setOnClickListener {
-                    trackSelector?.showQualityDialog()
+                    trackSelector?.showDialog(TRACK_TYPE_VIDEO_INDEX)
                 }
             }
 
@@ -163,7 +166,8 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
         if (savedInstanceState != null) {
             contentPosition = savedInstanceState.getLong(CONTENT_POSITION_KEY, 0)
             playWhenReady = savedInstanceState.getBoolean(PLAY_WHEN_READY_KEY, true)
-            indexChoiceQuality = savedInstanceState.getInt(INDEX_CHOICE_QUALITY_KEY, 0)
+            holderSelectedTrackItems = savedInstanceState
+                .getSerializable(SELECTED_TRACK_ITEMS_KEY) as HolderSelectedTrackItems
         }
     }
 
@@ -189,9 +193,9 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
     }
 
     private fun initializePlayer() {
-        trackSelector = VideoQualityTrackSelector(requireContext())
+        trackSelector = TrackSelector(requireContext())
             .apply {
-                indexChoiceQuality = this@ExoPlayerFragment.indexChoiceQuality
+                selectedTrackMap = this@ExoPlayerFragment.holderSelectedTrackItems.selectedTrackMap
             }
 
         exoPlayer = SimpleExoPlayer.Builder(requireContext())
@@ -236,7 +240,7 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
 
         outState.putLong(CONTENT_POSITION_KEY, contentPosition)
         outState.putBoolean(PLAY_WHEN_READY_KEY, playWhenReady)
-        outState.putInt(INDEX_CHOICE_QUALITY_KEY, indexChoiceQuality)
+        outState.putSerializable(SELECTED_TRACK_ITEMS_KEY, holderSelectedTrackItems)
     }
 
     override fun onStop() {
@@ -255,8 +259,8 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
         exoPlayer = null
         fragmentBinding.playerView.player = null
 
-        indexChoiceQuality = trackSelector!!.indexChoiceQuality
-        trackSelector!!.dismissQualityDialog()
+        holderSelectedTrackItems.selectedTrackMap = trackSelector!!.selectedTrackMap
+        trackSelector!!.dismissDialog()
         trackSelector = null
     }
 
@@ -280,7 +284,7 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
 
     override fun onTracksChanged(trackGroups: TrackGroupArray,
                                  trackSelections: TrackSelectionArray) {
-        trackSelector?.buildQualityDialog(requireContext())
+        trackSelector?.createTrackDialog(requireContext(), TRACK_TYPE_VIDEO_INDEX)
     }
 
     override fun getErrorMessage(error: PlaybackException): Pair<Int, String> {

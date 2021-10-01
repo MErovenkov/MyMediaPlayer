@@ -8,7 +8,7 @@
     android:paddingEnd="25dp" >
 
 <LinearLayout
-    android:id="@+id/quality_view_group"
+    android:id="@+id/selector_view_group"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"/>
