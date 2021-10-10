@@ -24,7 +24,7 @@ import androidx.fragment.app.Fragment
 import com.example.mymediaplayer.R
 import com.example.mymediaplayer.databinding.ExoPlayerControlViewBinding
 import com.example.mymediaplayer.databinding.FragmentExoPlayerBinding
-import com.example.mymediaplayer.ui.player.selector.TrackSelector
+import com.example.mymediaplayer.ui.player.selector.TrackSelectionHelper
 import com.example.mymediaplayer.util.CheckStatusNetwork
 import com.example.mymediaplayer.util.HolderSelectedTrackItems
 import com.example.mymediaplayer.util.extensions.*
@@ -68,7 +68,8 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
     private var exoPlayer: SimpleExoPlayer? = null
     private var playWhenReady = true
     private var contentPosition = 0L
-    private var trackSelector: TrackSelector? = null
+    private var trackSelector: DefaultTrackSelector? = null
+    private var trackSelectionHelper: TrackSelectionHelper? = null
     private var holderSelectedTrackItems: HolderSelectedTrackItems = HolderSelectedTrackItems()
 
     private lateinit var broadcastReceiver: BroadcastReceiver
@@ -89,7 +90,7 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
         exoPlayerControlBinding = ExoPlayerControlViewBinding.bind(view)
             .apply {
                 exoChangeQuality.setOnClickListener {
-                    trackSelector?.showDialog(TRACK_TYPE_VIDEO_INDEX)
+                    trackSelectionHelper?.showDialog(TRACK_TYPE_VIDEO_INDEX)
                 }
             }
 
@@ -193,10 +194,11 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
     }
 
     private fun initializePlayer() {
-        trackSelector = TrackSelector(requireContext())
-            .apply {
-                selectedTrackMap = this@ExoPlayerFragment.holderSelectedTrackItems.selectedTrackMap
-            }
+        trackSelector = DefaultTrackSelector(requireContext())
+
+        trackSelectionHelper = TrackSelectionHelper(trackSelector!!).apply {
+            selectedTrackMap = this@ExoPlayerFragment.holderSelectedTrackItems.selectedTrackMap
+        }
 
         exoPlayer = SimpleExoPlayer.Builder(requireContext())
             .setTrackSelector(trackSelector!!)
@@ -259,9 +261,12 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
         exoPlayer = null
         fragmentBinding.playerView.player = null
 
-        holderSelectedTrackItems.selectedTrackMap = trackSelector!!.selectedTrackMap
-        trackSelector!!.dismissDialog()
         trackSelector = null
+        trackSelectionHelper?.apply {
+            holderSelectedTrackItems.selectedTrackMap = selectedTrackMap
+            dismissDialog()
+        }
+        trackSelectionHelper = null
     }
 
     override fun onDestroyView() {
@@ -284,7 +289,7 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
 
     override fun onTracksChanged(trackGroups: TrackGroupArray,
                                  trackSelections: TrackSelectionArray) {
-        trackSelector?.createTrackDialog(requireContext(), TRACK_TYPE_VIDEO_INDEX)
+        trackSelectionHelper?.createTrackDialog(requireContext(), TRACK_TYPE_VIDEO_INDEX)
     }
 
     override fun getErrorMessage(error: PlaybackException): Pair<Int, String> {

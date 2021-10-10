@@ -11,8 +11,9 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.Format
 import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector.SelectionOverride
 
-class TrackSelector(context: Context): DefaultTrackSelector(context) {
+class TrackSelectionHelper(private val trackSelector: DefaultTrackSelector) {
 
     companion object {
         private const val UNKNOWN_VALUE = -1
@@ -37,12 +38,12 @@ class TrackSelector(context: Context): DefaultTrackSelector(context) {
     var selectedTrackMap: MutableMap<Int, Int> = mutableMapOf()
 
     fun createTrackDialog(context: Context, rendererIndex: Int) {
-        currentMappedTrackInfo?.apply {
+        trackSelector.currentMappedTrackInfo?.apply {
             trackType = getRendererType(rendererIndex)
 
             if (dialoguesMap[trackType] == null) {
                 getDialogBuilder(context)?.let {
-                    this@TrackSelector.rendererIndex = rendererIndex
+                    this@TrackSelectionHelper.rendererIndex = rendererIndex
                     trackGroupArray = getTrackGroups(rendererIndex)
 
                     searchSupportableTracks()
@@ -66,7 +67,7 @@ class TrackSelector(context: Context): DefaultTrackSelector(context) {
     }
 
     private fun isCapableRendering(groupIndex: Int, trackIndex: Int): Boolean {
-        return currentMappedTrackInfo
+        return trackSelector.currentMappedTrackInfo
             ?.getTrackSupport(rendererIndex, groupIndex, trackIndex) == C.FORMAT_HANDLED
     }
 
@@ -100,16 +101,18 @@ class TrackSelector(context: Context): DefaultTrackSelector(context) {
         selectedTrackMap[trackType]?.let {
             when {
                 it >= 0 -> {
-                    setParameters(buildUponParameters().setSelectionOverride(rendererIndex,
+                    trackSelector.setParameters(trackSelector.buildUponParameters()
+                                                             .setSelectionOverride(rendererIndex,
                         trackGroupArray!!, overrides[selectedTrackMap[trackType]!!]))
                 }
-                else -> setParameters(buildUponParameters().clearSelectionOverrides())
+                else -> trackSelector.setParameters(trackSelector.buildUponParameters()
+                                                                 .clearSelectionOverrides())
             }
         }
     }
 
     fun showDialog(rendererIndex: Int) {
-        currentMappedTrackInfo?.apply {
+        trackSelector.currentMappedTrackInfo?.apply {
             trackType = getRendererType(rendererIndex)
             dialoguesMap[trackType]?.show()
         }
