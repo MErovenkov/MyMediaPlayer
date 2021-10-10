@@ -50,7 +50,7 @@ class MediaFragment: Fragment() {
             override fun onClickItem(position: Int) {
                 getItem(position).apply {
                     mediaNavigation.openMedia(mediaMetadata.title.toString(),
-                                              playbackProperties!!.uri)
+                                              playbackProperties!!)
                 }
             }
         }

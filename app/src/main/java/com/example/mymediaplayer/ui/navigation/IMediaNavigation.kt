@@ -1,7 +1,7 @@
 package com.example.mymediaplayer.ui.navigation
 
-import android.net.Uri
+import com.google.android.exoplayer2.MediaItem.PlaybackProperties
 
 interface IMediaNavigation {
-    fun openMedia(title: String, uri: Uri)
+    fun openMedia(title: String, playbackProperties: PlaybackProperties)
 }

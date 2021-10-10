@@ -50,7 +50,8 @@ dependencies {
     implementation 'com.google.dagger:dagger:2.38.1'
     kapt 'com.google.dagger:dagger-compiler:2.38.1'
     //exoplayer
-    implementation 'com.google.android.exoplayer:exoplayer:2.15.0'
+    implementation 'com.google.android.exoplayer:exoplayer:2.15.1'
+    implementation 'com.google.android.exoplayer:extension-ima:2.15.1'
     //moshi-kotlin
     implementation 'com.squareup.moshi:moshi-kotlin:1.11.0'
 }

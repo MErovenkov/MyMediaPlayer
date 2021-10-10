@@ -1,14 +1,15 @@
 [
   {
     "title": "Big Buck Bunny",
-    "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+    "uri": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
   },
   {
     "title": "Apple 4x3 basic stream",
-    "url": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8"
+    "uri": "https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8"
   },
   {
     "title": "Tears of Steel",
-    "url": "https://storage.googleapis.com/wvmedia/clear/h264/tears/tears.mpd"
+    "uri": "https://storage.googleapis.com/wvmedia/clear/h264/tears/tears.mpd",
+    "ad_tag_uri": "https://raw.githubusercontent.com/InteractiveAdvertisingBureau/VAST_Samples/master/VAST%201-2.0%20Samples/Inline_LinearRegular_VAST2.0.xml"
   }
 ]

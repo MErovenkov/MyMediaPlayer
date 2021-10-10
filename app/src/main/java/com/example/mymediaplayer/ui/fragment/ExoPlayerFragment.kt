@@ -10,7 +10,6 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.graphics.drawable.Icon
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.util.Pair
@@ -24,15 +23,19 @@ import androidx.fragment.app.Fragment
 import com.example.mymediaplayer.R
 import com.example.mymediaplayer.databinding.ExoPlayerControlViewBinding
 import com.example.mymediaplayer.databinding.FragmentExoPlayerBinding
-import com.example.mymediaplayer.ui.player.selector.TrackSelectionHelper
+import com.example.mymediaplayer.ui.player.selector.TrackSelectionDialog
 import com.example.mymediaplayer.util.CheckStatusNetwork
 import com.example.mymediaplayer.util.HolderSelectedTrackItems
 import com.example.mymediaplayer.util.extensions.*
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.MediaItem.PlaybackProperties
 import com.google.android.exoplayer2.PlaybackException
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
-import com.google.android.exoplayer2.source.TrackGroupArray
+import com.google.android.exoplayer2.ext.ima.ImaAdsLoader
+import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
+import com.google.android.exoplayer2.source.MediaSourceFactory
+import com.google.android.exoplayer2.source.ads.AdsLoader
 import com.google.android.exoplayer2.trackselection.*
 import com.google.android.exoplayer2.util.ErrorMessageProvider
 import com.google.android.exoplayer2.util.Util
@@ -41,7 +44,8 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
 
     companion object {
         private const val TITLE_KEY = "title"
-        private const val URL_KEY = "url"
+        private const val URI_KEY = "uri"
+        private const val AD_TAG_URI_KEY = "adTagUri"
 
         private const val CONTENT_POSITION_KEY = "contentPosition"
         private const val PLAY_WHEN_READY_KEY = "playerWhenReady"
@@ -49,15 +53,18 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
         private const val SELECTED_TRACK_ITEMS_KEY = "holderSelectedTrackItems"
         private const val TRACK_TYPE_VIDEO_INDEX = 0
 
-        private const val ACTION_PIP_CONTROL = "pip_control"
-        private const val EXTRA_CONTROL_TYPE = "control_type"
+        private const val ACTION_PIP_CONTROL = "pipControl"
+        private const val EXTRA_CONTROL_TYPE = "controlType"
         private const val CONTROL_TYPE_PLAY_OR_PAUSE = 2
         private const val REQUEST_PLAY_OR_PAUSE = 4
 
-        fun getNewBundle(title: String, url: Uri): Bundle {
+        fun getNewBundle(title: String, playbackProperties: PlaybackProperties): Bundle {
             return Bundle().apply {
                 putString(TITLE_KEY, title)
-                putString(URL_KEY, url.toString())
+                putString(URI_KEY, playbackProperties.uri.toString())
+                playbackProperties.adsConfiguration
+                    ?.adTagUri
+                    ?.let { putString(AD_TAG_URI_KEY, it.toString()) }
             }
         }
     }
@@ -68,9 +75,12 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
     private var exoPlayer: SimpleExoPlayer? = null
     private var playWhenReady = true
     private var contentPosition = 0L
+
     private var trackSelector: DefaultTrackSelector? = null
-    private var trackSelectionHelper: TrackSelectionHelper? = null
+    private var trackSelectionDialog: TrackSelectionDialog? = null
     private var holderSelectedTrackItems: HolderSelectedTrackItems = HolderSelectedTrackItems()
+
+    private var adsLoader: AdsLoader? = null
 
     private lateinit var broadcastReceiver: BroadcastReceiver
     private lateinit var actionPlay: RemoteAction
@@ -90,7 +100,7 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
         exoPlayerControlBinding = ExoPlayerControlViewBinding.bind(view)
             .apply {
                 exoChangeQuality.setOnClickListener {
-                    trackSelectionHelper?.showDialog(TRACK_TYPE_VIDEO_INDEX)
+                    trackSelectionDialog?.showDialog(requireContext(), TRACK_TYPE_VIDEO_INDEX)
                 }
             }
 
@@ -196,38 +206,51 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
     private fun initializePlayer() {
         trackSelector = DefaultTrackSelector(requireContext())
 
-        trackSelectionHelper = TrackSelectionHelper(trackSelector!!).apply {
+        trackSelectionDialog = TrackSelectionDialog(trackSelector!!).apply {
             selectedTrackMap = this@ExoPlayerFragment.holderSelectedTrackItems.selectedTrackMap
         }
 
+        val mediaSourceFactory: MediaSourceFactory = DefaultMediaSourceFactory(requireContext())
+            .setAdsLoaderProvider { getAdsLoader() }
+            .setAdViewProvider(fragmentBinding.playerView)
+
         exoPlayer = SimpleExoPlayer.Builder(requireContext())
+            .setMediaSourceFactory(mediaSourceFactory)
             .setTrackSelector(trackSelector!!)
             .build()
-            .also { exoPlayer ->
-                requireArguments().apply {
-                    exoPlayerControlBinding.exoVideoTitle.text = getString(TITLE_KEY)
 
-                    exoPlayer.apply {
-                        addListener(this@ExoPlayerFragment)
+        exoPlayer?.apply {
+            addListener(this@ExoPlayerFragment)
+            setMediaItem(
+                MediaItem.Builder()
+                    .setUri(requireArguments().getString(URI_KEY))
+                    .setAdTagUri(requireArguments().getString(AD_TAG_URI_KEY))
+                    .build()
+            )
+            seekTo(this@ExoPlayerFragment.contentPosition)
+            playWhenReady = this@ExoPlayerFragment.playWhenReady
+            prepare()
+        }
 
-                        setMediaItem(
-                            MediaItem.Builder()
-                                .setUri(getString(URL_KEY))
-                                .build()
-                        )
+        exoPlayerControlBinding.exoVideoTitle.text = requireArguments().getString(TITLE_KEY)
 
-                        seekTo(this@ExoPlayerFragment.contentPosition)
-                        playWhenReady = this@ExoPlayerFragment.playWhenReady
+        fragmentBinding.playerView.apply {
+            player = exoPlayer
+            setErrorMessageProvider(this@ExoPlayerFragment)
+        }
+    }
 
-                        prepare()
+    private fun getAdsLoader(): AdsLoader? {
+        return requireArguments().getString(AD_TAG_URI_KEY)?.let {
+            ImaAdsLoader.Builder(requireContext())
+                .setPlayAdBeforeStartPosition(false)
+                .build()
+                .also {
+                    adsLoader = it.apply {
+                        setPlayer(exoPlayer)
                     }
                 }
-
-                fragmentBinding.playerView.apply {
-                    player = exoPlayer
-                    setErrorMessageProvider(this@ExoPlayerFragment)
-                }
-            }
+        } ?: adsLoader
     }
 
     override fun onPause() {
@@ -262,11 +285,17 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
         fragmentBinding.playerView.player = null
 
         trackSelector = null
-        trackSelectionHelper?.apply {
+        trackSelectionDialog?.apply {
             holderSelectedTrackItems.selectedTrackMap = selectedTrackMap
             dismissDialog()
         }
-        trackSelectionHelper = null
+        trackSelectionDialog = null
+
+        adsLoader?.apply {
+            setPlayer(null)
+            release()
+        }
+        adsLoader = null
     }
 
     override fun onDestroyView() {
@@ -286,11 +315,6 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
            requireActivity().showSystemBars()
        }
    }
-
-    override fun onTracksChanged(trackGroups: TrackGroupArray,
-                                 trackSelections: TrackSelectionArray) {
-        trackSelectionHelper?.createTrackDialog(requireContext(), TRACK_TYPE_VIDEO_INDEX)
-    }
 
     override fun getErrorMessage(error: PlaybackException): Pair<Int, String> {
         val errorString: String = when (error.errorCode) {

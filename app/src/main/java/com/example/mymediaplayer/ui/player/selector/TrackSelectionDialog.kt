@@ -13,7 +13,7 @@ import com.google.android.exoplayer2.source.TrackGroupArray
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector.SelectionOverride
 
-class TrackSelectionHelper(private val trackSelector: DefaultTrackSelector) {
+class TrackSelectionDialog(private val trackSelector: DefaultTrackSelector) {
 
     companion object {
         private const val UNKNOWN_VALUE = -1
@@ -37,23 +37,26 @@ class TrackSelectionHelper(private val trackSelector: DefaultTrackSelector) {
     * */
     var selectedTrackMap: MutableMap<Int, Int> = mutableMapOf()
 
-    fun createTrackDialog(context: Context, rendererIndex: Int) {
+    fun showDialog(context: Context, rendererIndex: Int) {
         trackSelector.currentMappedTrackInfo?.apply {
             trackType = getRendererType(rendererIndex)
 
             if (dialoguesMap[trackType] == null) {
-                getDialogBuilder(context)?.let {
-                    this@TrackSelectionHelper.rendererIndex = rendererIndex
+                getDialogBuilder(context)?.let { dialogBuilder ->
+                    this@TrackSelectionDialog.rendererIndex = rendererIndex
                     trackGroupArray = getTrackGroups(rendererIndex)
 
                     searchSupportableTracks()
 
-                    dialoguesMap[trackType] = createDialog(context, it)
+                    dialoguesMap[trackType] = createDialog(context, dialogBuilder)
                     setupParameters()
                 }
             }
+            dialoguesMap[trackType]?.show()
         }
     }
+
+    fun dismissDialog() = dialoguesMap[trackType]?.dismiss()
 
     private fun searchSupportableTracks() {
         for (groupIndex in 0 until trackGroupArray!!.length) {
@@ -109,16 +112,5 @@ class TrackSelectionHelper(private val trackSelector: DefaultTrackSelector) {
                                                                  .clearSelectionOverrides())
             }
         }
-    }
-
-    fun showDialog(rendererIndex: Int) {
-        trackSelector.currentMappedTrackInfo?.apply {
-            trackType = getRendererType(rendererIndex)
-            dialoguesMap[trackType]?.show()
-        }
-    }
-
-    fun dismissDialog(){
-        dialoguesMap[trackType]?.dismiss()
     }
 }

@@ -22,10 +22,11 @@ class MediaLocalData(private val parser: Parser) {
         }
 
         val mediaItemList = mediaDtoList
-            ?.filter { mediaDto -> mediaDto.url != null }
+            ?.filter { mediaDto -> mediaDto.uri != null }
             ?.map { mediaDto ->
                 MediaItem.Builder()
-                    .setUri(mediaDto.url)
+                    .setUri(mediaDto.uri)
+                    .setAdTagUri(mediaDto.adTagUri)
                     .setMediaMetadata(
                         MediaMetadata.Builder()
                             .setTitle(mediaDto.title)
