@@ -30,7 +30,6 @@ import com.example.mymediaplayer.util.extensions.*
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.MediaItem.PlaybackProperties
 import com.google.android.exoplayer2.PlaybackException
-import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.ext.ima.ImaAdsLoader
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory
@@ -40,7 +39,7 @@ import com.google.android.exoplayer2.trackselection.*
 import com.google.android.exoplayer2.util.ErrorMessageProvider
 import com.google.android.exoplayer2.util.Util
 
-class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<PlaybackException> {
+class ExoPlayerFragment: Fragment(), ErrorMessageProvider<PlaybackException> {
 
     companion object {
         private const val TITLE_KEY = "title"
@@ -220,7 +219,6 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
             .build()
 
         exoPlayer?.apply {
-            addListener(this@ExoPlayerFragment)
             setMediaItem(
                 MediaItem.Builder()
                     .setUri(requireArguments().getString(URI_KEY))
@@ -241,16 +239,17 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
     }
 
     private fun getAdsLoader(): AdsLoader? {
-        return requireArguments().getString(AD_TAG_URI_KEY)?.let {
+        return adsLoader?.apply {
+            setPlayer(exoPlayer)
+        } ?: requireArguments().getString(AD_TAG_URI_KEY)?.let {
             ImaAdsLoader.Builder(requireContext())
-                .setPlayAdBeforeStartPosition(false)
                 .build()
                 .also {
                     adsLoader = it.apply {
                         setPlayer(exoPlayer)
                     }
                 }
-        } ?: adsLoader
+        }
     }
 
     override fun onPause() {
@@ -291,16 +290,18 @@ class ExoPlayerFragment: Fragment(), Player.Listener, ErrorMessageProvider<Playb
         }
         trackSelectionDialog = null
 
-        adsLoader?.apply {
-            setPlayer(null)
-            release()
-        }
-        adsLoader = null
+        adsLoader?.setPlayer(null)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         requireActivity().showSystemBars()
+        releaseAdsLoader()
+    }
+
+    private fun releaseAdsLoader() {
+        adsLoader?.release()
+        adsLoader = null
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
